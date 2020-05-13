@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- encoding: utf-8; py-indent-offset: 4 -*-
 #
-# win_adsync_scheduler - Windows NFS Share check
+# win_adsync_scheduler - Azure AD Connecht Scheduler check
 #
 # Copyright (C) 2020  Marius Rieder <marius.rieder@scs.ch>
 #
@@ -19,7 +19,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#<<<win_adsync_schedule>>>
+# <<<win_adsync_schedule>>>
 # AllowedSyncCycleInterval            : 00:30:00
 # CurrentlyEffectiveSyncCycleInterval : 00:30:00
 # CustomizedSyncCycleInterval         : 

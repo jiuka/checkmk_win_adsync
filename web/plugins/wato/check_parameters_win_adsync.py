@@ -21,6 +21,7 @@ from cmk.gui.i18n import _
 from cmk.gui.valuespec import (
     Dictionary,
     DropdownChoice,
+    TextAscii,
     Tuple,
 )
 from cmk.gui.plugins.wato import (
@@ -91,4 +92,34 @@ rulespec_registry.register(
         group=RulespecGroupCheckParametersApplications,
         parameter_valuespec=_vs_win_adsync_scheduler,
         title=lambda: _("Azure AD Connect Sync Scheduler"),
+    ))
+
+def _vs_win_adsync_connector():
+    return Dictionary(
+        title=_('Azure AD Connect Connector'),
+        elements=[
+            ('duration',
+             Tuple(
+                 title=_("Maximal time the last sync took"),
+                 elements=[
+                     Age(title=_("Warning if longer than")),
+                     Age(title=_("Critical if longer than")),
+                 ],
+            )),
+        ]
+    )
+
+def _item_spec_win_adsync_connector():
+    return TextAscii(
+        title=_("Name of the Connector and the sync profile"),
+        allow_empty=False,
+    )
+
+rulespec_registry.register(
+    CheckParameterRulespecWithItem(
+        check_group_name="win_adsync_connector",
+        group=RulespecGroupCheckParametersApplications,
+        item_spec=_item_spec_win_adsync_connector,
+        parameter_valuespec=_vs_win_adsync_connector,
+        title=lambda: _("Azure AD Connect Connector"),
     ))

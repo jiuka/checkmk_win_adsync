@@ -11,7 +11,7 @@ Foreach ($conn in Get-ADSyncConnector) {
 
         Write-Host -NoNewline "$($conn.Name) $($profile.Name);"
         Write-Host -NoNewline "$($lastRun.Result);"
-        Write-Host -NoNewline "$($($lastRun.EndDate - $lastRun.StartDate).Milliseconds);"
+        Write-Host -NoNewline "$($($lastRun.EndDate - $lastRun.StartDate).TotalSeconds);"
         Write-Host "$($lastRun.EndDate);"
     }
 }

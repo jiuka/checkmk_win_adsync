@@ -1,0 +1,66 @@
+#!/usr/bin/python
+# -*- encoding: utf-8; py-indent-offset: 4 -*-
+#
+# win_adsync_connector - Azure AD Connect Connector check
+#
+# Copyright (C) 2020  Marius Rieder <marius.rieder@scs.ch>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+# <<<win_adsync_connector>>>
+# cmk.onmicrosoft.com - AAD Delta Import;success;903;05/13/2020 13:37:57;
+# cmk.onmicrosoft.com - AAD Delta Synchronization;success;124;05/13/2020 13:37:58;
+# cmk.onmicrosoft.com - AAD Export;success;890;05/13/2020 13:38:05;
+# cmk.com Full Import;success;523;05/12/2020 17:51:04;
+# cmk.com Delta Import;success;34;05/13/2020 13:37:53;
+# cmk.com Delta Synchronization;success;140;05/13/2020 13:37:58;
+# cmk.com Export;success;33;05/13/2020 13:38:06;
+
+factory_settings['win_adsync_connector_default_levels'] = {
+    'duration': (300, 600),
+}
+
+def parse_win_adsync_connector(item):
+    parsed = {}
+    for line in item:
+        pardes[line[0]] = line[1:]
+    return parsed
+
+def inventory_win_adsync_connector(parsed):
+    for name in parsed.keys():
+        yield name, {}
+
+@get_parsed_item_data
+def check_win_adsync_connector(item, params, data):
+    if data[0] == 'success':
+        yield 0, 'State: Success'
+    else:
+        yield 1, "State: %s", data[0]
+
+    yield check_levels(savefloat(data[1]),
+                       'duration',
+                       params.get('duration', None),
+                       human_readable_func=get_age_human_readable,
+                       infoname='Sync duration')
+
+check_info['win_adsync_connector'] = {
+  'parse_function': parse_win_adsync_connector,
+  'inventory_function': inventory_win_adsync_connector,
+  'check_function': check_win_adsync_connector,
+  'service_description': 'ADSync Scheduler',
+  'has_perfdata': True,
+  'group': 'win_adsync_connector',
+  'default_levels_variable': 'win_adsync_connector_default_levels',
+}
