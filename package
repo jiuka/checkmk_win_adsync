@@ -1,0 +1,24 @@
+{
+    'author': u'Marius Rieder <marius.rieder@scs.ch>',
+    'description': u'This package contains a check plugin to Monitor Azure AD Connect Sync Service',
+    'download_url': 'https://github.com/jiuka/checkmk_win_adsync/releases',
+    'files': {
+        'agents': [
+          'bakery/win_adsync',
+          'windows/plugins/win_adsync.ps1',
+        ],
+        'checkman': ['win_adsync'],
+        'checks': ['win_adsync'],
+        'doc': [],
+        'inventory': [],
+        'notifications': [],
+        'pnp-templates': [],
+        'web': [
+          'plugins/wato/agent_bakery_win_adsync.py',
+        ]},
+    'name': 'win_adsync',
+    'title': u'Check for Azure AD Connect Sync Service',
+    'version': '1.0',
+    'version.min_required': '1.6.0',
+    'version.packaged': '1.6.0p11'
+}

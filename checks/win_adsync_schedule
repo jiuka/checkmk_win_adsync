@@ -1,0 +1,78 @@
+#!/usr/bin/python
+# -*- encoding: utf-8; py-indent-offset: 4 -*-
+#
+# win_adsync_scheduler - Windows NFS Share check
+#
+# Copyright (C) 2020  Marius Rieder <marius.rieder@scs.ch>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+#<<<win_adsync_schedule>>>
+# AllowedSyncCycleInterval            : 00:30:00
+# CurrentlyEffectiveSyncCycleInterval : 00:30:00
+# CustomizedSyncCycleInterval         : 
+# NextSyncCyclePolicyType             : Delta
+# NextSyncCycleStartTimeInUTC         : 13.05.2020 13:37:51
+# PurgeRunHistoryInterval             : 7.00:00:00
+# SyncCycleEnabled                    : True
+# MaintenanceEnabled                  : True
+# StagingModeEnabled                  : False
+# SchedulerSuspended                  : False
+# SyncCycleInProgress                 : False
+
+factory_settings['win_adsync_scheduler_default_levels'] = {
+    'SyncCycleEnabled': (True, 2),
+    'MaintenanceEnabled': (True, 2),
+}
+
+def parse_win_adsync_scheduler(items):
+    parsed = {}
+    for line in items:
+        key, value = map(lambda s: s.strip(), line[0].split(':', 1))
+        if value == 'True':
+            parsed[key] = True
+        elif value == 'False':
+            parsed[key] = False
+        elif key in ['NextSyncCycleStartTimeInUTC']:
+            parsed[key] = time.strptime(value, "%d.%m.%Y %H:%M:%S")
+        else:
+            parsed[key] = value
+    return parsed
+
+def inventory_win_adsync_scheduler(parsed):
+    yield None, {}
+
+def check_win_adsync_scheduler(item, params, parsed):
+    for state in ['SyncCycleEnabled', 'MaintenanceEnabled', 'StagingModeEnabled', 'SchedulerSuspended']:
+        if state not in params:
+            continue
+
+        if state not in parsed:
+            yield 3, "Unknown state for %s" % state
+            continue
+
+        if parsed[state] == params[state][0]:
+            yield 0, "%s is %s" % (state, parsed[state])
+        else:
+            yield params[state][1], "%s is %s" % (state, parsed[state])
+
+check_info['win_adsync_scheduler'] = {
+  'parse_function' : parse_win_adsync_scheduler,
+  'inventory_function' : inventory_win_adsync_scheduler,
+  'check_function'     : check_win_adsync_scheduler,
+  'service_description': 'ADSync Scheduler',
+  'group': 'win_adsync_scheduler',
+  'default_levels_variable': 'win_adsync_scheduler_default_levels',
+}
