@@ -7,8 +7,11 @@
           'bakery/win_adsync',
           'windows/plugins/win_adsync.ps1',
         ],
-        'checkman': ['win_adsync'],
-        'checks': ['win_adsync'],
+        'checkman': [],
+        'checks': [
+          'win_adsync_schedule',
+          'win_adsync_connector',
+        ],
         'doc': [],
         'inventory': [],
         'notifications': [],
