@@ -35,7 +35,7 @@ factory_settings['win_adsync_connector_default_levels'] = {
 def parse_win_adsync_connector(item):
     parsed = {}
     for line in item:
-        pardes[line[0]] = line[1:]
+        parsed[line[0]] = line[1:]
     return parsed
 
 def inventory_win_adsync_connector(parsed):
