@@ -20,6 +20,7 @@
         'notifications': [],
         'pnp-templates': [],
         'web': [
+          'plugins/wato/check_parameters_win_adsync.py',
           'plugins/wato/agent_bakery_win_adsync.py',
         ]},
     'name': 'win_adsync',
