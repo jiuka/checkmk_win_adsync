@@ -1,0 +1,17 @@
+title: Check Azure AD Connect Connector
+agents: windows
+catalog: os/misc
+distribution:
+author: Marius Rieder <marius.rieder@scs.ch>
+license: GPL
+description:
+ This check monitors the status of the Azure AD Connect connector status.
+
+ The check can be configured via the corresponding WATO rule {Azure AD Connect Connector}
+
+item:
+ The Name of the connector and the Sync Profile
+
+inventory:
+ One check per connector and sync profile reported in the agent section {<<<win_adsync_connector>>>}.
+

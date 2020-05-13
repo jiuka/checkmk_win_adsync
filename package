@@ -4,12 +4,15 @@
     'download_url': 'https://github.com/jiuka/checkmk_win_adsync/releases',
     'files': {
         'agents': [
-          'bakery/win_adsync',
+          'bakery/win_adsync.py',
           'windows/plugins/win_adsync.ps1',
         ],
-        'checkman': [],
+        'checkman': [
+          'win_adsync_scheduler',
+          'win_adsync_connector',
+        ],
         'checks': [
-          'win_adsync_schedule',
+          'win_adsync_scheduler',
           'win_adsync_connector',
         ],
         'doc': [],

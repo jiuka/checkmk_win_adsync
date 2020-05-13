@@ -1,0 +1,16 @@
+title: Check Azure AD Connect Sync Scheduler
+agents: windows
+catalog: os/misc
+distribution:
+author: Marius Rieder <marius.rieder@scs.ch>
+license: GPL
+description:
+ This check monitors the status of the Azure AD Connect Sync Scheduler
+
+ The check can be configured via the corresponding WATO rule {Azure AD Connect Sync Scheduler}
+
+item:
+ ADSync Scheduler
+
+inventory:
+ One check per server
