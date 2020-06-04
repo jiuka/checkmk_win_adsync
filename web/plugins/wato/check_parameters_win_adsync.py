@@ -26,6 +26,7 @@ from cmk.gui.valuespec import (
 )
 from cmk.gui.plugins.wato import (
     RulespecGroupCheckParametersApplications,
+    CheckParameterRulespecWithItem,
     CheckParameterRulespecWithoutItem,
     rulespec_registry,
 )
