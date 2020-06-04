@@ -47,7 +47,7 @@ def check_win_adsync_connector(item, params, data):
     if data[0] == 'success':
         yield 0, 'State: Success'
     else:
-        yield 1, "State: %s", data[0]
+        yield 1, "State: %s" % data[0]
 
     yield check_levels(savefloat(data[1]),
                        'duration',
