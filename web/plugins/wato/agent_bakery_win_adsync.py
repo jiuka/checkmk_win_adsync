@@ -11,10 +11,13 @@ from cmk.gui.plugins.wato import (
 )
 
 try:
-    from cmk.gui.cee.plugins.wato.agent_bakery import RulespecGroupMonitoringAgentsWindowsAgent
-except:
-    from cmk.gui.plugins.wato import RulespecGroupCheckParametersStorage as RulespecGroupMonitoringAgentsWindowsAgent
+    from cmk.gui.cee.plugins.wato.agent_bakery import (
+        RulespecGroupMonitoringAgentsWindowsAgent
+    )
+except Exception:
+    RulespecGroupMonitoringAgentsWindowsAgent = None
 
+    
 def _valuespec_agent_config_win_adsync():
     return DropdownChoice(
         title=_("Azure AD Connect Sync"),
@@ -26,10 +29,11 @@ def _valuespec_agent_config_win_adsync():
         ],
     )
 
-rulespec_registry.register(
-    HostRulespec(
-        group=RulespecGroupMonitoringAgentsWindowsAgent,
-        name="agent_config:win_adsync",
-        valuespec=_valuespec_agent_config_win_adsync,
-    ))
 
+if RulespecGroupMonitoringAgentsWindowsAgent is not None:
+    rulespec_registry.register(
+        HostRulespec(
+            group=RulespecGroupMonitoringAgentsWindowsAgent,
+            name="agent_config:win_adsync",
+            valuespec=_valuespec_agent_config_win_adsync,
+        ))
