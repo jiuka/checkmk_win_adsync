@@ -26,7 +26,7 @@
 # cmk.com Full Import;success;523;05/12/2020 17:51:04;
 # cmk.com Delta Import;success;34;05/13/2020 13:37:53;
 # cmk.com Delta Synchronization;success;140;05/13/2020 13:37:58;
-# cmk.com Export;success;33;05/13/2020 13:38:06;
+# cmk.com Export;completed-export-errors;33;05/13/2020 13:38:06;
 
 factory_settings['win_adsync_connector_default_levels'] = {
     'duration': (300, 600),
