@@ -20,17 +20,14 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 # <<<win_adsync_schedule>>>
-# AllowedSyncCycleInterval            : 00:30:00
-# CurrentlyEffectiveSyncCycleInterval : 00:30:00
-# CustomizedSyncCycleInterval         : 
-# NextSyncCyclePolicyType             : Delta
-# NextSyncCycleStartTimeInUTC         : 13.05.2020 13:37:51
-# PurgeRunHistoryInterval             : 7.00:00:00
-# SyncCycleEnabled                    : True
-# MaintenanceEnabled                  : True
-# StagingModeEnabled                  : False
-# SchedulerSuspended                  : False
-# SyncCycleInProgress                 : False
+# SyncCycleEnabled:True
+# MaintenanceEnabled:True
+# StagingModeEnabled:False
+# SchedulerSuspended:False
+# SyncCycleInProgress:False
+# NextSyncCycleStartTimeInUTC:05.06.2020 05:11:51
+
+import calendar
 
 factory_settings['win_adsync_scheduler_default_levels'] = {
     'SyncCycleEnabled': (True, 2),
@@ -40,13 +37,17 @@ factory_settings['win_adsync_scheduler_default_levels'] = {
 def parse_win_adsync_scheduler(items):
     parsed = {}
     for line in items:
-        key, value = map(lambda s: s.strip(), line[0].split(':', 1))
+        key, value = line
         if value == 'True':
             parsed[key] = True
         elif value == 'False':
             parsed[key] = False
         elif key in ['NextSyncCycleStartTimeInUTC']:
-            parsed[key] = time.strptime(value, "%d.%m.%Y %H:%M:%S")
+            try:
+                struc_time = time.strptime(value, "%d.%m.%Y %H:%M:%S")
+                parsed[key] = time.localtime((calendar.timegm(struc_time)))
+            except Exception:
+                pass
         else:
             parsed[key] = value
     return parsed
@@ -67,6 +68,9 @@ def check_win_adsync_scheduler(item, params, parsed):
             yield 0, "%s is %s" % (state, parsed[state])
         else:
             yield params[state][1], "%s is %s" % (state, parsed[state])
+    
+    if 'NextSyncCycleStartTimeInUTC' in parsed:
+        yield 0, "Last sync: %s" % time.strftime("%c", parsed['NextSyncCycleStartTimeInUTC'])
 
 check_info['win_adsync_scheduler'] = {
   'parse_function' : parse_win_adsync_scheduler,

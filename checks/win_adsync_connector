@@ -20,17 +20,22 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 # <<<win_adsync_connector>>>
-# cmk.onmicrosoft.com - AAD Delta Import;success;903;05/13/2020 13:37:57;
-# cmk.onmicrosoft.com - AAD Delta Synchronization;success;124;05/13/2020 13:37:58;
-# cmk.onmicrosoft.com - AAD Export;success;890;05/13/2020 13:38:05;
-# cmk.com Full Import;success;523;05/12/2020 17:51:04;
-# cmk.com Delta Import;success;34;05/13/2020 13:37:53;
-# cmk.com Delta Synchronization;success;140;05/13/2020 13:37:58;
-# cmk.com Export;completed-export-errors;33;05/13/2020 13:38:06;
+# cmk.onmicrosoft.com - AAD Delta Import;success;903;05.13.2020 13:37:57;
+# cmk.onmicrosoft.com - AAD Delta Synchronization;success;124;05.13.2020 13:37:58;
+# cmk.onmicrosoft.com - AAD Export;success;890;05.13.2020 13:38:05;
+# cmk.com Full Import;success;523;05.12.2020 17:51:04;
+# cmk.com Delta Import;success;34;05.13.2020 13:37:53;
+# cmk.com Delta Synchronization;success;140;05.13.2020 13:37:58;
+# cmk.com Export;completed-export-errors;33;05.13.2020 13:38:06;
+
+
+import calendar
+
 
 factory_settings['win_adsync_connector_default_levels'] = {
     'duration': (300, 600),
 }
+
 
 def parse_win_adsync_connector(item):
     parsed = {}
@@ -38,9 +43,11 @@ def parse_win_adsync_connector(item):
         parsed[line[0]] = line[1:]
     return parsed
 
+
 def inventory_win_adsync_connector(parsed):
     for name in parsed.keys():
         yield name, {}
+
 
 @get_parsed_item_data
 def check_win_adsync_connector(item, params, data):
@@ -49,11 +56,19 @@ def check_win_adsync_connector(item, params, data):
     else:
         yield 1, "State: %s" % data[0]
 
+    try:
+        struc_time = time.strptime(data[2], "%d.%m.%Y %H:%M:%S")
+        localtime = time.localtime(calendar.timegm(struc_time))
+        yield 0, "Last sync: %s" % time.strftime("%c", localtime)
+    except Exception:
+        pass
+
     yield check_levels(savefloat(data[1]),
                        'duration',
                        params.get('duration', None),
                        human_readable_func=get_age_human_readable,
                        infoname='Sync duration')
+
 
 check_info['win_adsync_connector'] = {
   'parse_function': parse_win_adsync_connector,
