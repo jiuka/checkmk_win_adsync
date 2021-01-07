@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- encoding: utf-8; py-indent-offset: 4 -*-
 
 from cmk.gui.i18n import _
@@ -11,11 +11,11 @@ from cmk.gui.plugins.wato import (
 )
 
 try:
-    from cmk.gui.cee.plugins.wato.agent_bakery import (
-        RulespecGroupMonitoringAgentsWindowsAgent
+    from cmk.gui.cee.plugins.wato.agent_bakery.rulespecs.utils import (
+        RulespecGroupMonitoringAgentsAgentPlugins
     )
 except Exception:
-    RulespecGroupMonitoringAgentsWindowsAgent = None
+    RulespecGroupMonitoringAgentsAgentPlugins = None
 
     
 def _valuespec_agent_config_win_adsync():
@@ -30,10 +30,10 @@ def _valuespec_agent_config_win_adsync():
     )
 
 
-if RulespecGroupMonitoringAgentsWindowsAgent is not None:
+if RulespecGroupMonitoringAgentsAgentPlugins is not None:
     rulespec_registry.register(
         HostRulespec(
-            group=RulespecGroupMonitoringAgentsWindowsAgent,
+            group=RulespecGroupMonitoringAgentsAgentPlugins,
             name="agent_config:win_adsync",
             valuespec=_valuespec_agent_config_win_adsync,
         ))
