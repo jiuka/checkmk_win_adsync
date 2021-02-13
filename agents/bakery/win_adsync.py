@@ -1,12 +1,17 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8; py-indent-offset: 4 -*-
 
-def bake_win_adsync(opsys, conf, conf_dir, plugins_dir):
-    shutil.copy2(cmk.utils.paths.local_agents_dir + '/windows/plugins/win_adsync.ps1',
-                 plugins_dir + '/win_adsync.ps1')
+from pathlib import Path
+from typing import Any
+
+from cmk.base.cee.plugins.bakery.bakery_api.v0 import FileGenerator, OS, Plugin, register
 
 
-bakery_info['win_adsync'] = {
-    'bake_function' : bake_win_adsync,
-    'os'            : [ 'windows' ],
-}
+def get_win_adsync_files(conf: Any) -> FileGenerator:
+    yield Plugin(base_os=OS.WINDOWS, source=Path('win_adsync.ps1'))
+
+
+register.bakery_plugin(
+    name='win_adsync',
+    files_function=get_win_adsync_files,
+)
