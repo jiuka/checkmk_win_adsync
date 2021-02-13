@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # -*- encoding: utf-8; py-indent-offset: 4 -*-
 #
 # win_adsync_scheduler - Azure AD Connecht Scheduler check
@@ -27,16 +27,18 @@
 # SyncCycleInProgress:False
 # NextSyncCycleStartTimeInUTC:05.06.2020 05:11:51
 
-import calendar
+from datetime import datetime
+from .agent_based_api.v1 import (
+    register,
+    Result,
+    Service,
+    State,
+)
 
-factory_settings['win_adsync_scheduler_default_levels'] = {
-    'SyncCycleEnabled': (True, 2),
-    'MaintenanceEnabled': (True, 2),
-}
 
-def parse_win_adsync_scheduler(items):
+def parse_win_adsync_scheduler(string_table):
     parsed = {}
-    for line in items:
+    for line in string_table:
         key, value = line
         if value == 'True':
             parsed[key] = True
@@ -44,39 +46,54 @@ def parse_win_adsync_scheduler(items):
             parsed[key] = False
         elif key in ['NextSyncCycleStartTimeInUTC']:
             try:
-                struc_time = time.strptime(value, "%d.%m.%Y %H:%M:%S")
-                parsed[key] = time.localtime((calendar.timegm(struc_time)))
+                parsed[key] = datetime.strptime(value, "%d.%m.%Y %H:%M:%S")
             except Exception:
                 pass
         else:
             parsed[key] = value
     return parsed
 
-def inventory_win_adsync_scheduler(parsed):
-    yield None, {}
 
-def check_win_adsync_scheduler(item, params, parsed):
+register.agent_section(
+    name='win_adsync_scheduler',
+    parse_function=parse_win_adsync_scheduler,
+)
+
+
+def discovery_win_adsync_scheduler(section):
+    if len(section) > 0:
+        yield Service()
+
+
+def check_win_adsync_scheduler(params, section):
     for state in ['SyncCycleEnabled', 'MaintenanceEnabled', 'StagingModeEnabled', 'SchedulerSuspended']:
         if state not in params:
             continue
 
-        if state not in parsed:
-            yield 3, "Unknown state for %s" % state
+        if state not in section:
+            yield Result(state=State.UNKNOWN, summary='Unknown state for %s' % state)
             continue
 
-        if parsed[state] == params[state][0]:
-            yield 0, "%s is %s" % (state, parsed[state])
-        else:
-            yield params[state][1], "%s is %s" % (state, parsed[state])
-    
-    if 'NextSyncCycleStartTimeInUTC' in parsed:
-        yield 0, "Last sync: %s" % time.strftime("%c", parsed['NextSyncCycleStartTimeInUTC'])
+        if params[state][1] == -1:
+            continue
 
-check_info['win_adsync_scheduler'] = {
-  'parse_function' : parse_win_adsync_scheduler,
-  'inventory_function' : inventory_win_adsync_scheduler,
-  'check_function'     : check_win_adsync_scheduler,
-  'service_description': 'ADSync Scheduler',
-  'group': 'win_adsync_scheduler',
-  'default_levels_variable': 'win_adsync_scheduler_default_levels',
-}
+        if section[state] == params[state][0]:
+            yield Result(state=State.OK, summary='%s is %s' % (state, section[state]))
+        else:
+            yield Result(state=State(params[state][1]), summary='%s is %s' % (state, section[state]))
+
+    if 'NextSyncCycleStartTimeInUTC' in section:
+        yield Result(state=State.OK, summary='Next sync: %s' % section['NextSyncCycleStartTimeInUTC'].astimezone().strftime('%c'))
+
+
+register.check_plugin(
+    name='win_adsync_scheduler',
+    service_name='ADSync Scheduler',
+    discovery_function=discovery_win_adsync_scheduler,
+    check_function=check_win_adsync_scheduler,
+    check_ruleset_name='win_adsync_scheduler',
+    check_default_parameters={
+        'SyncCycleEnabled': (True, 2),
+        'MaintenanceEnabled': (True, 2),
+    },
+)
