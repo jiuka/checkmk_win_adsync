@@ -70,7 +70,7 @@ def check_win_adsync_scheduler(item, params, parsed):
             yield params[state][1], "%s is %s" % (state, parsed[state])
     
     if 'NextSyncCycleStartTimeInUTC' in parsed:
-        yield 0, "Last sync: %s" % time.strftime("%c", parsed['NextSyncCycleStartTimeInUTC'])
+        yield 0, "Next sync: %s" % time.strftime("%c", parsed['NextSyncCycleStartTimeInUTC'])
 
 check_info['win_adsync_scheduler'] = {
   'parse_function' : parse_win_adsync_scheduler,

@@ -74,7 +74,7 @@ check_info['win_adsync_connector'] = {
   'parse_function': parse_win_adsync_connector,
   'inventory_function': inventory_win_adsync_connector,
   'check_function': check_win_adsync_connector,
-  'service_description': 'ADSync Scheduler',
+  'service_description': 'ADSync %s',
   'has_perfdata': True,
   'group': 'win_adsync_connector',
   'default_levels_variable': 'win_adsync_connector_default_levels',
