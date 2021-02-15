@@ -24,7 +24,6 @@ import os
 import time
 from datetime import datetime, timezone
 from cmk.base.plugins.agent_based.agent_based_api.v1 import (
-    Metric,
     Result,
     Service,
     State,
@@ -109,5 +108,5 @@ def test_check_win_adsync_connector_tz(timezone, section, result):
     else:
         del(os.environ['TZ'])
     time.tzset()
-    
+
     assert result in output
