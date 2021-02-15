@@ -20,7 +20,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import pytest  # type: ignore[import]
-import datetime
+import os
+import time
+from datetime import datetime, timezone
 from cmk.base.plugins.agent_based.agent_based_api.v1 import (
     Metric,
     Result,
@@ -39,10 +41,10 @@ from cmk.base.plugins.agent_based import win_adsync_connector
         ],
         {
             'cmk.com Delta Synchronization': win_adsync_connector.AdsyncConnector(
-                'success', 140, datetime.datetime(2020, 12, 5, 13, 37, 58)
+                'success', 140, datetime(2020, 12, 5, 13, 37, 58, tzinfo=timezone.utc)
             ),
             'cmk.com Export': win_adsync_connector.AdsyncConnector(
-                'completed-export-errors', 33, datetime.datetime(2020, 12, 5, 13, 38, 6)
+                'completed-export-errors', 33, datetime(2020, 12, 5, 13, 38, 6, tzinfo=timezone.utc)
             ),
         }
     ),
@@ -56,10 +58,10 @@ def test_parse_win_adsync_connector(string_table, result):
     (
         {
             'cmk.com Delta Synchronization': win_adsync_connector.AdsyncConnector(
-                'success', 140, datetime.datetime(2020, 12, 5, 13, 37, 58)
+                'success', 140, datetime(2020, 12, 5, 13, 37, 58, tzinfo=timezone.utc)
             ),
             'cmk.com Export': win_adsync_connector.AdsyncConnector(
-                'completed-export-errors', 33, datetime.datetime(2020, 12, 5, 13, 38, 6)
+                'completed-export-errors', 33, datetime(2020, 12, 5, 13, 38, 6, tzinfo=timezone.utc)
             ),
         },
         [
@@ -75,94 +77,37 @@ def test_discovery_win_adsync_connector(section, result):
 DEFAULT_PARAMS = {'duration': (300, 600)}
 
 
-@pytest.mark.parametrize('item, params, section, result', [
+@pytest.mark.parametrize('timezone, section, result', [
     (
-        '',
-        {},
+        'Europe/Zurich',
         {
-            'cmk.com Delta Synchronization': win_adsync_connector.AdsyncConnector(
-                'success', 140, datetime.datetime(2020, 12, 5, 13, 37, 58)
-            ),
             'cmk.com Export': win_adsync_connector.AdsyncConnector(
-                'completed-export-errors', 33, datetime.datetime(2020, 12, 5, 13, 38, 6)
+                'completed-export-errors', 33, datetime(2020, 12, 5, 13, 38, 6, tzinfo=timezone.utc)
             ),
         },
-        []
+        Result(state=State.OK, summary='Last sync: Sat Dec  5 14:38:06 2020'),
     ),
     (
-        'cmk.com Delta Synchronization',
-        {},
+        'Europe/London',
         {
-            'cmk.com Delta Synchronization': win_adsync_connector.AdsyncConnector(
-                'success', 140, datetime.datetime(2020, 12, 5, 13, 37, 58)
-            ),
             'cmk.com Export': win_adsync_connector.AdsyncConnector(
-                'completed-export-errors', 33, datetime.datetime(2020, 12, 5, 13, 38, 6)
+                'completed-export-errors', 33, datetime(2020, 12, 5, 13, 38, 6, tzinfo=timezone.utc)
             ),
         },
-        [
-            Result(state=State.OK, summary='State: Success'),
-            Result(state=State.OK, summary='Last sync: Sat Dec  5 13:37:58 2020'),
-            Result(state=State.OK, summary='Sync duration: 2 minutes 20 seconds'),
-            Metric('duration', 140.0, levels=(300.0, 600.0))
-        ]
-    ),
-    (
-        'cmk.com Delta Synchronization',
-        {'duration': (100, 200)},
-        {
-            'cmk.com Delta Synchronization': win_adsync_connector.AdsyncConnector(
-                'success', 140, datetime.datetime(2020, 12, 5, 13, 37, 58)
-            ),
-            'cmk.com Export': win_adsync_connector.AdsyncConnector(
-                'completed-export-errors', 33, datetime.datetime(2020, 12, 5, 13, 38, 6)
-            ),
-        },
-        [
-            Result(state=State.OK, summary='State: Success'),
-            Result(state=State.OK, summary='Last sync: Sat Dec  5 13:37:58 2020'),
-            Result(state=State.WARN, summary='Sync duration: 2 minutes 20 seconds (warn/crit at 1 minute 40 seconds/3 minutes 20 seconds)'),
-            Metric('duration', 140.0, levels=(100.0, 200.0))
-        ]
-    ),
-    (
-        'cmk.com Delta Synchronization',
-        {'duration': (100, 110)},
-        {
-            'cmk.com Delta Synchronization': win_adsync_connector.AdsyncConnector(
-                'success', 140, datetime.datetime(2020, 12, 5, 13, 37, 58)
-            ),
-            'cmk.com Export': win_adsync_connector.AdsyncConnector(
-                'completed-export-errors', 33, datetime.datetime(2020, 12, 5, 13, 38, 6)
-            ),
-        },
-        [
-            Result(state=State.OK, summary='State: Success'),
-            Result(state=State.OK, summary='Last sync: Sat Dec  5 13:37:58 2020'),
-            Result(state=State.CRIT, summary='Sync duration: 2 minutes 20 seconds (warn/crit at 1 minute 40 seconds/1 minute 50 seconds)'),
-            Metric('duration', 140.0, levels=(100.0, 110.0))
-        ]
-    ),
-    (
-        'cmk.com Export',
-        {},
-        {
-            'cmk.com Delta Synchronization': win_adsync_connector.AdsyncConnector(
-                'success', 140, datetime.datetime(2020, 12, 5, 13, 37, 58)
-            ),
-            'cmk.com Export': win_adsync_connector.AdsyncConnector(
-                'completed-export-errors', 33, datetime.datetime(2020, 12, 5, 13, 38, 6)
-            ),
-        },
-        [
-            Result(state=State.WARN, summary='State: completed-export-errors'),
-            Result(state=State.OK, summary='Last sync: Sat Dec  5 13:38:06 2020'),
-            Result(state=State.OK, summary='Sync duration: 33 seconds'),
-            Metric('duration', 33.0, levels=(300.0, 600.0))
-        ]
+        Result(state=State.OK, summary='Last sync: Sat Dec  5 13:38:06 2020'),
     ),
 ])
-def test_check_win_adsync_connector(item, params, section, result):
-    merged_params = DEFAULT_PARAMS.copy()
-    merged_params.update(params)
-    assert list(win_adsync_connector.check_win_adsync_connector(item, merged_params, section)) == result
+def test_check_win_adsync_connector_tz(timezone, section, result):
+    oldtimezone = os.environ.get('TZ', None)
+    os.environ['TZ'] = timezone
+    time.tzset()
+
+    output = list(win_adsync_connector.check_win_adsync_connector('cmk.com Export', DEFAULT_PARAMS, section))
+
+    if oldtimezone:
+        os.environ['TZ'] = oldtimezone
+    else:
+        del(os.environ['TZ'])
+    time.tzset()
+    
+    assert result in output

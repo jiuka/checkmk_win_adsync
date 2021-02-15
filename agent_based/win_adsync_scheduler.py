@@ -27,7 +27,7 @@
 # SyncCycleInProgress:False
 # NextSyncCycleStartTimeInUTC:05.06.2020 05:11:51
 
-from datetime import datetime
+from datetime import datetime, timezone
 from .agent_based_api.v1 import (
     register,
     Result,
@@ -46,7 +46,7 @@ def parse_win_adsync_scheduler(string_table):
             parsed[key] = False
         elif key in ['NextSyncCycleStartTimeInUTC']:
             try:
-                parsed[key] = datetime.strptime(value, "%d.%m.%Y %H:%M:%S")
+                parsed[key] = datetime.strptime(value, "%d.%m.%Y %H:%M:%S").replace(tzinfo=timezone.utc)
             except Exception:
                 pass
         else:

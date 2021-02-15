@@ -29,7 +29,7 @@
 # cmk.com Export;completed-export-errors;33;05.13.2020 13:38:06;
 
 from typing import NamedTuple
-from datetime import datetime
+from datetime import datetime, timezone
 from .agent_based_api.v1 import (
     check_levels,
     register,
@@ -51,8 +51,8 @@ def parse_win_adsync_connector(string_table):
     for line in string_table:
         parsed[line[0]] = AdsyncConnector(
             state=line[1],
-            duration=int(line[2]),
-            lastrun=datetime.strptime(line[3], '%d.%m.%Y %H:%M:%S'),
+            duration=float(line[2]),
+            lastrun=datetime.strptime(line[3], '%d.%m.%Y %H:%M:%S').replace(tzinfo=timezone.utc),
         )
     return parsed
 

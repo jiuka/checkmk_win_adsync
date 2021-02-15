@@ -20,7 +20,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import pytest  # type: ignore[import]
-import datetime
+import os
+import time
+from datetime import datetime, timezone
 from cmk.base.plugins.agent_based.agent_based_api.v1 import (
     Result,
     Service,
@@ -42,7 +44,7 @@ from cmk.base.plugins.agent_based import win_adsync_scheduler
         ],
         {
             'MaintenanceEnabled': True,
-            'NextSyncCycleStartTimeInUTC': datetime.datetime(2020, 6, 5, 5, 11, 51),
+            'NextSyncCycleStartTimeInUTC': datetime(2020, 6, 5, 5, 11, 51, tzinfo=timezone.utc),
             'SchedulerSuspended': False,
             'StagingModeEnabled': False,
             'SyncCycleEnabled': True,
@@ -59,7 +61,7 @@ def test_parse_win_adsync_scheduler(string_table, result):
     (
         {
             'MaintenanceEnabled': True,
-            'NextSyncCycleStartTimeInUTC': datetime.datetime(2020, 6, 5, 5, 11, 51),
+            'NextSyncCycleStartTimeInUTC': datetime(2020, 6, 5, 5, 11, 51, tzinfo=timezone.utc),
             'SchedulerSuspended': False,
             'StagingModeEnabled': False,
             'SyncCycleEnabled': True,
@@ -83,7 +85,7 @@ DEFAULT_PARAMS = {
         {},
         {
             'MaintenanceEnabled': True,
-            'NextSyncCycleStartTimeInUTC': datetime.datetime(2020, 6, 5, 5, 11, 51),
+            'NextSyncCycleStartTimeInUTC': datetime(2020, 6, 5, 5, 11, 51, tzinfo=timezone.utc),
             'SchedulerSuspended': False,
             'StagingModeEnabled': False,
             'SyncCycleEnabled': True,
@@ -99,7 +101,7 @@ DEFAULT_PARAMS = {
         {},
         {
             'MaintenanceEnabled': True,
-            'NextSyncCycleStartTimeInUTC': datetime.datetime(2020, 6, 5, 5, 11, 51),
+            'NextSyncCycleStartTimeInUTC': datetime(2020, 6, 5, 5, 11, 51, tzinfo=timezone.utc),
             'SchedulerSuspended': False,
             'StagingModeEnabled': False,
             'SyncCycleEnabled': False,
@@ -115,7 +117,7 @@ DEFAULT_PARAMS = {
         {},
         {
             'MaintenanceEnabled': True,
-            'NextSyncCycleStartTimeInUTC': datetime.datetime(2020, 6, 5, 5, 11, 51),
+            'NextSyncCycleStartTimeInUTC': datetime(2020, 6, 5, 5, 11, 51, tzinfo=timezone.utc),
             'SchedulerSuspended': False,
             'StagingModeEnabled': False,
             'SyncCycleEnabled': False,
@@ -131,7 +133,7 @@ DEFAULT_PARAMS = {
         {'SchedulerSuspended': (False, 1)},
         {
             'MaintenanceEnabled': True,
-            'NextSyncCycleStartTimeInUTC': datetime.datetime(2020, 6, 5, 5, 11, 51),
+            'NextSyncCycleStartTimeInUTC': datetime(2020, 6, 5, 5, 11, 51, tzinfo=timezone.utc),
             'SchedulerSuspended': False,
             'StagingModeEnabled': False,
             'SyncCycleEnabled': True,
@@ -148,7 +150,7 @@ DEFAULT_PARAMS = {
         {'SchedulerSuspended': (False, 1)},
         {
             'MaintenanceEnabled': True,
-            'NextSyncCycleStartTimeInUTC': datetime.datetime(2020, 6, 5, 5, 11, 51),
+            'NextSyncCycleStartTimeInUTC': datetime(2020, 6, 5, 5, 11, 51, tzinfo=timezone.utc),
             'SchedulerSuspended': True,
             'StagingModeEnabled': False,
             'SyncCycleEnabled': True,
@@ -165,7 +167,7 @@ DEFAULT_PARAMS = {
         {'SchedulerSuspended': (False, -1), 'SyncCycleEnabled': (False, -1)},
         {
             'MaintenanceEnabled': True,
-            'NextSyncCycleStartTimeInUTC': datetime.datetime(2020, 6, 5, 5, 11, 51),
+            'NextSyncCycleStartTimeInUTC': datetime(2020, 6, 5, 5, 11, 51, tzinfo=timezone.utc),
             'SchedulerSuspended': True,
             'StagingModeEnabled': False,
             'SyncCycleEnabled': True,
@@ -181,3 +183,162 @@ def test_check_win_adsync_scheduler(params, section, result):
     merged_params = DEFAULT_PARAMS
     merged_params.update(params)
     assert list(win_adsync_scheduler.check_win_adsync_scheduler(merged_params, section)) == result
+
+
+@pytest.mark.parametrize('params, section, result', [
+    (
+        {},
+        {
+            'MaintenanceEnabled': True,
+            'NextSyncCycleStartTimeInUTC': datetime(2020, 6, 5, 5, 11, 51, tzinfo=timezone.utc),
+            'SchedulerSuspended': False,
+            'StagingModeEnabled': False,
+            'SyncCycleEnabled': True,
+            'SyncCycleInProgress': False,
+        },
+        [
+            Result(state=State.OK, summary='SyncCycleEnabled is True'),
+            Result(state=State.OK, summary='MaintenanceEnabled is True'),
+            Result(state=State.OK, summary='Next sync: Fri Jun  5 05:11:51 2020')
+        ]
+    ),
+    (
+        {},
+        {
+            'MaintenanceEnabled': True,
+            'NextSyncCycleStartTimeInUTC': datetime(2020, 6, 5, 5, 11, 51, tzinfo=timezone.utc),
+            'SchedulerSuspended': False,
+            'StagingModeEnabled': False,
+            'SyncCycleEnabled': False,
+            'SyncCycleInProgress': False,
+        },
+        [
+            Result(state=State.CRIT, summary='SyncCycleEnabled is False'),
+            Result(state=State.OK, summary='MaintenanceEnabled is True'),
+            Result(state=State.OK, summary='Next sync: Fri Jun  5 05:11:51 2020')
+        ]
+    ),
+    (
+        {},
+        {
+            'MaintenanceEnabled': True,
+            'NextSyncCycleStartTimeInUTC': datetime(2020, 6, 5, 5, 11, 51, tzinfo=timezone.utc),
+            'SchedulerSuspended': False,
+            'StagingModeEnabled': False,
+            'SyncCycleEnabled': False,
+            'SyncCycleInProgress': False,
+        },
+        [
+            Result(state=State.CRIT, summary='SyncCycleEnabled is False'),
+            Result(state=State.OK, summary='MaintenanceEnabled is True'),
+            Result(state=State.OK, summary='Next sync: Fri Jun  5 05:11:51 2020')
+        ]
+    ),
+    (
+        {'SchedulerSuspended': (False, 1)},
+        {
+            'MaintenanceEnabled': True,
+            'NextSyncCycleStartTimeInUTC': datetime(2020, 6, 5, 5, 11, 51, tzinfo=timezone.utc),
+            'SchedulerSuspended': False,
+            'StagingModeEnabled': False,
+            'SyncCycleEnabled': True,
+            'SyncCycleInProgress': False,
+        },
+        [
+            Result(state=State.OK, summary='SyncCycleEnabled is True'),
+            Result(state=State.OK, summary='MaintenanceEnabled is True'),
+            Result(state=State.OK, summary='SchedulerSuspended is False'),
+            Result(state=State.OK, summary='Next sync: Fri Jun  5 05:11:51 2020')
+        ]
+    ),
+    (
+        {'SchedulerSuspended': (False, 1)},
+        {
+            'MaintenanceEnabled': True,
+            'NextSyncCycleStartTimeInUTC': datetime(2020, 6, 5, 5, 11, 51, tzinfo=timezone.utc),
+            'SchedulerSuspended': True,
+            'StagingModeEnabled': False,
+            'SyncCycleEnabled': True,
+            'SyncCycleInProgress': False,
+        },
+        [
+            Result(state=State.OK, summary='SyncCycleEnabled is True'),
+            Result(state=State.OK, summary='MaintenanceEnabled is True'),
+            Result(state=State.WARN, summary='SchedulerSuspended is True'),
+            Result(state=State.OK, summary='Next sync: Fri Jun  5 05:11:51 2020')
+        ]
+    ),
+    (
+        {'SchedulerSuspended': (False, -1), 'SyncCycleEnabled': (False, -1)},
+        {
+            'MaintenanceEnabled': True,
+            'NextSyncCycleStartTimeInUTC': datetime(2020, 6, 5, 5, 11, 51, tzinfo=timezone.utc),
+            'SchedulerSuspended': True,
+            'StagingModeEnabled': False,
+            'SyncCycleEnabled': True,
+            'SyncCycleInProgress': False,
+        },
+        [
+            Result(state=State.OK, summary='MaintenanceEnabled is True'),
+            Result(state=State.OK, summary='Next sync: Fri Jun  5 05:11:51 2020')
+        ]
+    ),
+])
+def test_check_win_adsync_scheduler(params, section, result):
+    merged_params = DEFAULT_PARAMS
+    merged_params.update(params)
+    assert list(win_adsync_scheduler.check_win_adsync_scheduler(merged_params, section)) == result
+
+
+@pytest.mark.parametrize('timezone, section, result', [
+    (
+        'Europe/Zurich',
+        {
+            'MaintenanceEnabled': True,
+            'NextSyncCycleStartTimeInUTC': datetime(2020, 6, 5, 5, 11, 51, tzinfo=timezone.utc),
+            'SchedulerSuspended': True,
+            'StagingModeEnabled': False,
+            'SyncCycleEnabled': True,
+            'SyncCycleInProgress': False,
+        },
+        Result(state=State.OK, summary='Next sync: Fri Jun  5 07:11:51 2020'),
+    ),
+    (
+        'Europe/London',
+        {
+            'MaintenanceEnabled': True,
+            'NextSyncCycleStartTimeInUTC': datetime(2020, 6, 5, 5, 11, 51, tzinfo=timezone.utc),
+            'SchedulerSuspended': True,
+            'StagingModeEnabled': False,
+            'SyncCycleEnabled': True,
+            'SyncCycleInProgress': False,
+        },
+        Result(state=State.OK, summary='Next sync: Fri Jun  5 06:11:51 2020'),
+    ),
+    (
+        'UTC',
+        {
+            'MaintenanceEnabled': True,
+            'NextSyncCycleStartTimeInUTC': datetime(2020, 6, 5, 5, 11, 51, tzinfo=timezone.utc),
+            'SchedulerSuspended': True,
+            'StagingModeEnabled': False,
+            'SyncCycleEnabled': True,
+            'SyncCycleInProgress': False,
+        },
+        Result(state=State.OK, summary='Next sync: Fri Jun  5 05:11:51 2020'),
+    ),
+])
+def test_check_win_adsync_scheduler_tz(timezone, section, result):
+    oldtimezone = os.environ.get('TZ', None)
+    os.environ['TZ'] = timezone
+    time.tzset()
+
+    output = list(win_adsync_scheduler.check_win_adsync_scheduler({}, section))
+
+    if oldtimezone:
+        os.environ['TZ'] = oldtimezone
+    else:
+        del(os.environ['TZ'])
+    time.tzset()
+
+    assert result in output
