@@ -4,7 +4,7 @@
 from pathlib import Path
 from typing import Any
 
-from cmk.base.cee.plugins.bakery.bakery_api.v0 import FileGenerator, OS, Plugin, register
+from cmk.base.cee.plugins.bakery.bakery_api.v1 import FileGenerator, OS, Plugin, register
 
 
 def get_win_adsync_files(conf: Any) -> FileGenerator:
