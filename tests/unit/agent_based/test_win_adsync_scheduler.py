@@ -233,7 +233,7 @@ def test_check_win_adsync_scheduler_tz(timezone, section, result):
     if oldtimezone:
         os.environ['TZ'] = oldtimezone
     else:
-        del(os.environ['TZ'])
+        del os.environ['TZ']
     time.tzset()
 
     assert result in output

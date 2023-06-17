@@ -25,7 +25,7 @@ from cmk.gui.valuespec import (
     TextAscii,
     Tuple,
 )
-from cmk.gui.plugins.wato import (
+from cmk.gui.plugins.wato.utils import (
     RulespecGroupCheckParametersApplications,
     CheckParameterRulespecWithItem,
     CheckParameterRulespecWithoutItem,
