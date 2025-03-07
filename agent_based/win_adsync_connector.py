@@ -83,7 +83,14 @@ def check_win_adsync_connector(item: str, params: dict, section: dict[AdsyncConn
     else:
         yield Result(state=State.WARN, summary=f'State: {conn.state}')
 
-    yield Result(state=State.OK, summary='Last sync: %s' % conn.lastrun.astimezone().strftime('%c'))
+    last_sync_delta = datetime.now(timezone.utc) - conn.lastrun
+    yield from check_levels(
+        value=last_sync_delta.total_seconds(),
+        metric_name='last_sync',
+        levels_upper=params.get('last_sync', None),
+        render_func=render.time_offset,
+        label='Last sync'
+    )
 
     yield from check_levels(
         value=conn.duration,

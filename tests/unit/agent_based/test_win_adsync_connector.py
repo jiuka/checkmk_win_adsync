@@ -84,7 +84,7 @@ DEFAULT_PARAMS = {'duration': ('fixed', (300, 600))}
                 'completed-export-errors', 33, datetime(2020, 12, 5, 13, 38, 6, tzinfo=timezone.utc)
             ),
         },
-        Result(state=State.OK, summary='Last sync: Sat Dec  5 14:38:06 2020'),
+        Result(state=State.OK, summary='Last sync: 2 hours 21 minutes'),
     ),
     (
         'Europe/London',
@@ -93,10 +93,11 @@ DEFAULT_PARAMS = {'duration': ('fixed', (300, 600))}
                 'completed-export-errors', 33, datetime(2020, 12, 5, 13, 38, 6, tzinfo=timezone.utc)
             ),
         },
-        Result(state=State.OK, summary='Last sync: Sat Dec  5 13:38:06 2020'),
+        Result(state=State.OK, summary='Last sync: 2 hours 21 minutes'),
     ),
 ])
-def test_check_win_adsync_connector_tz(timezone, section, result):
+def test_check_win_adsync_connector_tz(freezer, timezone, section, result):
+    freezer.move_to('2020-12-05 16:00')
     oldtimezone = os.environ.get('TZ', None)
     os.environ['TZ'] = timezone
     time.tzset()

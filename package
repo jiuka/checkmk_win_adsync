@@ -11,6 +11,7 @@
             'win_adsync/agent_based/win_adsync_connector.py',
             'win_adsync/checkman/win_adsync_scheduler',
             'win_adsync/checkman/win_adsync_connector',
+            'win_adsync/graphing/win_adsync.py',
             'win_adsync/rulesets/agent_config.py',
             'win_adsync/rulesets/check_parameters.py',
         ],

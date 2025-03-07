@@ -114,8 +114,19 @@ def _parameter_win_adsync_connector():
                     form_spec_template=TimeSpan(
                         displayed_magnitudes=[TimeMagnitude.HOUR, TimeMagnitude.MINUTE, TimeMagnitude.SECOND]
                     ),
-                    prefill_fixed_levels=DefaultValue(LevelsType.FIXED),
+                    prefill_fixed_levels=DefaultValue(value=(30, 60)),
                     migrate=migrate_to_integer_simple_levels,
+                ),
+                required=False,
+            ),
+            'last_sync': DictElement(
+                parameter_form=SimpleLevels(
+                    title=Title('Maximal time since the last sync'),
+                    level_direction=LevelDirection.UPPER,
+                    form_spec_template=TimeSpan(
+                        displayed_magnitudes=[TimeMagnitude.DAY, TimeMagnitude.HOUR, TimeMagnitude.MINUTE]
+                    ),
+                    prefill_fixed_levels=DefaultValue(value=(3600, 7200)),
                 ),
                 required=False,
             ),
