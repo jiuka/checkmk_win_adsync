@@ -73,7 +73,7 @@ def test_discovery_win_adsync_connector(section, result):
     assert list(win_adsync_connector.discovery_win_adsync_connector(section)) == result
 
 
-DEFAULT_PARAMS = {'duration': (300, 600)}
+DEFAULT_PARAMS = {'duration': ('fixed', (300, 600))}
 
 
 @pytest.mark.parametrize('timezone, section, result', [

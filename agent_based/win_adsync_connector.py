@@ -3,7 +3,7 @@
 #
 # win_adsync_connector - Azure AD Connect Connector check
 #
-# Copyright (C) 2020  Marius Rieder <marius.rieder@scs.ch>
+# Copyright (C) 2020-2025  Marius Rieder <marius.rieder@scs.ch>
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -30,13 +30,17 @@
 
 from typing import NamedTuple
 from datetime import datetime, timezone
-from .agent_based_api.v1 import (
+from cmk.agent_based.v2 import (
+    AgentSection,
+    CheckPlugin,
+    CheckResult,
     check_levels,
-    register,
-    render,
-    Result,
+    DiscoveryResult,
     Service,
     State,
+    StringTable,
+    render,
+    Result,
 )
 
 
@@ -46,7 +50,7 @@ class AdsyncConnector(NamedTuple):
     lastrun: datetime
 
 
-def parse_win_adsync_connector(string_table):
+def parse_win_adsync_connector(string_table: StringTable) -> dict[AdsyncConnector]:
     parsed = {}
     for line in string_table:
         parsed[line[0]] = AdsyncConnector(
@@ -57,18 +61,18 @@ def parse_win_adsync_connector(string_table):
     return parsed
 
 
-register.agent_section(
+agent_section_win_adsync_connector = AgentSection(
     name='win_adsync_connector',
     parse_function=parse_win_adsync_connector,
 )
 
 
-def discovery_win_adsync_connector(section):
+def discovery_win_adsync_connector(section: dict[AdsyncConnector]) -> DiscoveryResult:
     for name in section.keys():
         yield Service(item=name)
 
 
-def check_win_adsync_connector(item, params, section):
+def check_win_adsync_connector(item: str, params: dict, section: dict[AdsyncConnector]) -> CheckResult:
     if item not in section:
         return
 
@@ -90,11 +94,11 @@ def check_win_adsync_connector(item, params, section):
     )
 
 
-register.check_plugin(
+check_plugin_win_adsync_connector = CheckPlugin(
     name='win_adsync_connector',
     service_name='ADSync %s',
     discovery_function=discovery_win_adsync_connector,
     check_function=check_win_adsync_connector,
     check_ruleset_name='win_adsync_connector',
-    check_default_parameters={'duration': (300, 600)},
-)
+    check_default_parameters={'duration': ('fixed', (300, 600))},
+ )
