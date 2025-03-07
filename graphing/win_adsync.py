@@ -17,7 +17,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-from cmk.graphing.v1 import graphs, metrics, perfometers, translations, Title
+from cmk.graphing.v1 import metrics, perfometers, translations, Title
 
 translation_win_adsync_connector = translations.Translation(
     name='win_adsync_connector',

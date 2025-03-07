@@ -25,7 +25,6 @@ from cmk.rulesets.v1.form_specs import (
     DictElement,
     Dictionary,
     LevelDirection,
-    LevelsType,
     migrate_to_integer_simple_levels,
     ServiceState,
     SimpleLevels,

@@ -108,4 +108,4 @@ check_plugin_win_adsync_connector = CheckPlugin(
     check_function=check_win_adsync_connector,
     check_ruleset_name='win_adsync_connector',
     check_default_parameters={'duration': ('fixed', (300, 600))},
- )
+)
