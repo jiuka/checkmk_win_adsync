@@ -23,12 +23,12 @@ import pytest  # type: ignore[import]
 import os
 import time
 from datetime import datetime, timezone
-from cmk.base.plugins.agent_based.agent_based_api.v1 import (
+from cmk.agent_based.v2 import (
     Result,
     Service,
     State,
 )
-from cmk.base.plugins.agent_based import win_adsync_connector
+from cmk_addons.plugins.win_adsync.agent_based import win_adsync_connector
 
 
 @pytest.mark.parametrize('string_table, result', [
