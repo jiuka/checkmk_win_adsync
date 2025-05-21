@@ -3,28 +3,26 @@
     'description': u'This package contains a check plugin to Monitor Azure AD Connect Sync Service',
     'download_url': 'https://github.com/jiuka/checkmk_win_adsync/releases',
     'files': {
-        'agent_based': [
-            'win_adsync_scheduler.py',
-            'win_adsync_connector.py',
-        ],
         'agents': [
             'windows/plugins/win_adsync.ps1',
         ],
-        'checkman': [
-            'win_adsync_scheduler',
-            'win_adsync_connector',
+        'cmk_addons_plugins': [
+            'win_adsync/agent_based/win_adsync_scheduler.py',
+            'win_adsync/agent_based/win_adsync_connector.py',
+            'win_adsync/checkman/win_adsync_scheduler',
+            'win_adsync/checkman/win_adsync_connector',
+            'win_adsync/graphing/win_adsync.py',
+            'win_adsync/rulesets/agent_config.py',
+            'win_adsync/rulesets/check_parameters.py',
         ],
         'lib': [
             'python3/cmk/base/cee/plugins/bakery/win_adsync.py',
         ],
-        'web': [
-            'plugins/wato/check_parameters_win_adsync.py',
-            'plugins/wato/agent_bakery_win_adsync.py',
-        ]},
+    },
     'name': 'win_adsync',
     'title': u'Check for Azure AD Connect Sync Service',
-    'version': '2.2.0',
-    'version.min_required': '2.2.0',
-    'version.packaged': '2.2.0',
-    'version.usable_until': '2.3.0'
+    'version': '2.3.0',
+    'version.min_required': '2.3.0',
+    'version.packaged': '2.3.0',
+    'version.usable_until': '2.4.0',
 }

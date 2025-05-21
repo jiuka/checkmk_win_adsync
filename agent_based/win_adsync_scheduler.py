@@ -3,7 +3,7 @@
 #
 # win_adsync_scheduler - Azure AD Connecht Scheduler check
 #
-# Copyright (C) 2020  Marius Rieder <marius.rieder@scs.ch>
+# Copyright (C) 2020-2025  Marius Rieder <marius.rieder@scs.ch>
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -28,15 +28,19 @@
 # NextSyncCycleStartTimeInUTC:05.06.2020 05:11:51
 
 from datetime import datetime, timezone
-from .agent_based_api.v1 import (
-    register,
+from cmk.agent_based.v2 import (
+    AgentSection,
+    CheckPlugin,
+    CheckResult,
+    DiscoveryResult,
     Result,
     Service,
     State,
+    StringTable,
 )
 
 
-def parse_win_adsync_scheduler(string_table):
+def parse_win_adsync_scheduler(string_table: StringTable) -> dict:
     parsed = {}
     for line in string_table:
         key, value = line
@@ -54,18 +58,18 @@ def parse_win_adsync_scheduler(string_table):
     return parsed
 
 
-register.agent_section(
+agent_section_win_adsync_scheduler = AgentSection(
     name='win_adsync_scheduler',
     parse_function=parse_win_adsync_scheduler,
 )
 
 
-def discovery_win_adsync_scheduler(section):
+def discovery_win_adsync_scheduler(section: dict) -> DiscoveryResult:
     if len(section) > 0:
         yield Service()
 
 
-def check_win_adsync_scheduler(params, section):
+def check_win_adsync_scheduler(params: dict, section: dict) -> CheckResult:
     for state in ['SyncCycleEnabled', 'MaintenanceEnabled', 'StagingModeEnabled', 'SchedulerSuspended']:
         if state not in params:
             continue
@@ -86,7 +90,7 @@ def check_win_adsync_scheduler(params, section):
         yield Result(state=State.OK, summary='Next sync: %s' % section['NextSyncCycleStartTimeInUTC'].astimezone().strftime('%c'))
 
 
-register.check_plugin(
+check_plugin_win_adsync_scheduler = CheckPlugin(
     name='win_adsync_scheduler',
     service_name='ADSync Scheduler',
     discovery_function=discovery_win_adsync_scheduler,

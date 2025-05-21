@@ -1,4 +1,7 @@
 flake8
 pytest
+pytest-md
 pytest-cov
+pytest-emoji
 requests-mock
+pytest-freezer
